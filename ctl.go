@@ -69,7 +69,14 @@ func (c *CTL) Exec(ctx context.Context, args []string, out io.Writer) (interface
 	// execute and get results of call: [interface{}, error]
 	result := fn.Call(in)
 
-	return result[0].Interface(), result[1].Interface().(error)
+	if result[1].Interface() != nil {
+		err, ok := result[1].Interface().(error)
+		if !ok {
+			return result[0].Interface(), nil
+		}
+		return result[0].Interface(), err
+	}
+	return result[0].Interface(), nil
 }
 
 // Help lists functions and arguments of the client
